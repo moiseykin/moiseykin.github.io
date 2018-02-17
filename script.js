@@ -10,7 +10,7 @@ function randomInRange(min, max) {
 var expression = document.createElement('div');
 expression.classList.add('expression');
 expression.innerHTML = `
-	<span class="first-number">${firstNumber}</span> + <span class="second-number">${secondNumber}</span>  =  <span class="amount">?</span>
+	<span class="first-number">${firstNumber}</span> + <span class="second-number">${secondNumber}</span>  =<span class="amount">?</span>
 `;
 
 var expressionFirstNumber = expression.querySelector('.first-number'),
@@ -68,6 +68,7 @@ firstNumberInput.classList.add('numberInput');
 convCont.append(firstNumberInput);
 firstNumberInput.style.left = ((centerFirstArc - 22) + 'px');
 firstNumberInput.style.top = (-40 + 'px'); 
+firstNumberInput.autofocus = true;
 createFirstArc();
 
 var secondNumberInput = document.createElement('input');
@@ -85,6 +86,7 @@ function appendSecondInputValue() {
 			convCont.append(secondNumberInput);
 			secondNumberInput.style.left = ((centerSecondArc - 35) + 'px');
 			secondNumberInput.style.top = (-7 + 'px'); 
+			secondNumberInput.focus();
 			createSecondArc(); 
 		}
 	};
@@ -105,26 +107,38 @@ function checkValue(inputValue, spanValue, span) {
 		span.classList.remove('spanError');
 		appendSecondInputValue();
 	};
-
+	if (inputValue.value === "") {
+		inputValue.classList.remove('inputError');
+	};
 	if (firstNumberInput.disabled === true && secondNumberInput.disabled === true) {
 		amount.after(resultInput); 
 		amount.remove();
+		resultInput.focus();
 	};
 
 };
 
-function checkResult() { 
-	if (resultInput.value === String(sumNumbers)) {
+function checkResult() {  
+	if ( resultInput.value === String(sumNumbers)) {
+		resultInput.style.fontSize = '60px'
 		resultInput.disabled = true;
 		resultInput.classList.remove('inputError');
-	} else {
+	} else if ( resultInput.value === "" || resultInput.value.charAt(0) === "1") {// вместо "1" можно испольовать String(sumNumbers).charAt(0) для универсалььности
+		resultInput.classList.remove('inputError');
+		if ( resultInput.value.charAt(1) !== "") {
 		resultInput.classList.add('inputError');
+		
+		};
+	} else if ( resultInput.value.charAt(0) !== "1"){
+		resultInput.classList.add('inputError');
+		//звпрет ввода кроме удаления
+		resultInput.value = resultInput.value.substring(0,1);//другой вариант через keyCode != 8 
 	}
 };
 
-firstNumberInput.onclick = () => firstNumberInput.value = "";
-secondNumberInput.onclick = () => secondNumberInput.value = "";
-resultInput.onclick = () => resultInput.value = "";
+firstNumberInput.onclick = () => {firstNumberInput.value = ""; firstNumberInput.classList.remove('inputError');}
+secondNumberInput.onclick = () => {secondNumberInput.value = ""; secondNumberInput.classList.remove('inputError');}
+resultInput.onclick = () => {resultInput.value = ""; resultInput.classList.remove('inputError');}
 firstNumberInput.oninput = () => checkValue(firstNumberInput, firstNumber, expressionFirstNumber);
 secondNumberInput.oninput = () => checkValue(secondNumberInput, secondNumber, expressionSecondNumber);
 resultInput.oninput = checkResult;
